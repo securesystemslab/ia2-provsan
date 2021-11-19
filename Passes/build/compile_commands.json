@@ -1,0 +1,13 @@
+[
+{
+  "directory": "/tmp/ia2-phase2/provsan/Passes/build",
+  "command": "/usr/bin/clang++   -I/usr/lib/llvm-13/include  -g -fPIC   -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS  -fno-exceptions -o DynUntrustedAllocPre/CMakeFiles/LLVMDynUntrustedAllocPre.dir/DynUntrustedAllocPre.cpp.o -c /tmp/ia2-phase2/provsan/Passes/DynUntrustedAllocPre/DynUntrustedAllocPre.cpp",
+  "file": "/tmp/ia2-phase2/provsan/Passes/DynUntrustedAllocPre/DynUntrustedAllocPre.cpp"
+},
+
+{
+  "directory": "/tmp/ia2-phase2/provsan/Passes/build",
+  "command": "/usr/bin/clang++   -I/usr/lib/llvm-13/include  -g -fPIC   -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS  -fno-exceptions -o DynUntrustedAllocPost/CMakeFiles/LLVMDynUntrustedAllocPost.dir/DynUntrustedAllocPost.cpp.o -c /tmp/ia2-phase2/provsan/Passes/DynUntrustedAllocPost/DynUntrustedAllocPost.cpp",
+  "file": "/tmp/ia2-phase2/provsan/Passes/DynUntrustedAllocPost/DynUntrustedAllocPost.cpp"
+}
+]
