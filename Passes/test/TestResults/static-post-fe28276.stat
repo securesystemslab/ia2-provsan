@@ -1,5 +1,0 @@
-Number of alloc instructions modified to unsafe: 0
-Total number hooks given a LocalID: 0
-Total allocHooks: 0
-Total reallocHooks: 0
-Total deallocHooks: 0
