@@ -15,7 +15,6 @@
 #ifndef LLVM_PROV_SAN_CFG_HASH_MPK_H
 #define LLVM_PROV_SAN_CFG_HASH_MPK_H
 
-#include "CFGMST.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CallSite.h"
 #include "llvm/IR/Function.h"
