@@ -14,6 +14,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "DynUntrustedAllocPost.h"
+#include "ProvSanCFGHash.h"
 
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/PostOrderIterator.h"
@@ -139,10 +140,15 @@ PreservedAnalyses ProvsanPost::run(Module &M, ModuleAnalysisManager &MAM) {
   if (MPKTestRemoveHooks)
     RemoveHooks = MPKTestRemoveHooks;
 
+  auto &FAM = MAM.getResult<FunctionalAnalysisManagerModuleProxy>(M).getManager();
+  auto LookupTLI = [&FAM](Function &F) -> TargetLibraryInfo & {
+      return FAM.getAnalysis<TargetLibraryInfoWrapperPass>().getTLI(F);
+    };
+
   // Post inliner pass, iterate over all functions and find hook CallSites.
   // Assign a unique local ID in a deterministic pattern to ensure localID is
   // consistent between runs.
-  assignLocalIDs(M);
+  assignLocalIDs(M, LookupTLI);
 
   if (!MPKProfilePath.empty()) {
     for (auto *allocSite : patchList) {
@@ -288,7 +294,7 @@ static bool funcSort(Function *F1, Function *F2) {
   return F1->getName().str() > F2->getName().str();
 }
 
-void ProvsanPost::assignLocalIDs(Module &M) {
+void ProvsanPost::assignLocalIDs(Module &M, function_ref<TargetLibraryInfo &(Function &)> LookupTLI) {
   std::vector<Function *> WorkList;
   for (Function &F : M) {
     if (!F.isDeclaration())
@@ -300,6 +306,7 @@ void ProvsanPost::assignLocalIDs(Module &M) {
   LLVM_DEBUG(errs() << "Search for modified functions!\n");
 
   auto fault_map = getFaultingAllocMap();
+  std::map<uint64_t, std::string> FuncHashMap;
 
   // Note on ModuleSlotTracker:
   // The MST is used for "naming" BasicBlocks that do not already
@@ -315,6 +322,22 @@ void ProvsanPost::assignLocalIDs(Module &M) {
   ModuleSlotTracker MST(&M, /*shouldInitializeAllMetaData*/ false);
 
   for (Function *F : WorkList) {
+    uint64_t FuncHash = computeCFGHash(*F, LookupTLI(*F));
+    if (FuncHash == 0) {
+      // Something has gone horribly wrong, print results.
+      errs() << "ERROR:\tFunc: " << F->getName().str() << " returned hash: " << FuncHash << "\n";
+    }
+
+    auto hash_index = FuncHashMap.find(FuncHash);
+    if (hash_index != FuncHashMap.end()) {
+      // We have a function hash overlap, report error.
+      errs() << "Hash: " << FuncHash << " overlaps on Functions (" << hash_index->second << ") & ("
+              << F->getName().str() << ")\n";
+    }
+
+    // Assuming there is not a collision, add to map.
+    FuncHashMap.emplace(FuncHash, F->getName().str());
+    
     MST.incorporateFunction(*F);
     ReversePostOrderTraversal<Function *> RPOT(F);
     IDGenerator LocalIDG;

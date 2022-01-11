@@ -1,4 +1,4 @@
-//===- Transforms/ProvSanCFGHash.h - ProvSan CFG Hasher ------*- C++ -*-===//
+//===- Transforms/ProvSanCFGHash.h - ProvSan CFG Hasher ---------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -15,16 +15,12 @@
 #ifndef LLVM_PROV_SAN_CFG_HASH_MPK_H
 #define LLVM_PROV_SAN_CFG_HASH_MPK_H
 
-#include "llvm/IR/BasicBlock.h"
-#include "llvm/IR/CallSite.h"
+#include "llvm/Analysis/TargetLibraryInfo.h"
 #include "llvm/IR/Function.h"
-#include "llvm/Support/JamCRC.h"
-#include <cstdint>
-#include <vector>
 
 namespace llvm {
 
-uint64_t computeCFGHash(Function &F);
+uint64_t computeCFGHash(Function &F, TargetLibraryInfo &TLI);
 
 } // namespace llvm
 #endif

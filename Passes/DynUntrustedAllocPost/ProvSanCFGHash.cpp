@@ -1,4 +1,4 @@
-//===-- ProvSanCFGHash.cpp - CFGHash Infrastructure ---------------===//
+//===-- ProvSanCFGHash.cpp - CFGHash Infrastructure -----------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -14,9 +14,15 @@
 
 #include "ProvSanCFGHash.h"
 #include "llvm/include/llvm/Support/Endian.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/CallSite.h"
 #include "llvm/IR/InstVisitor.h"
+#include "llvm/ProfileData/InstrProf.h"
+#include "llvm/Support/JamCRC.h"
 #include "llvm/Transforms/Instrumentation/CFGMST.h"
 #include "llvm/Transforms/Instrumentation/ValueProfileCollector.h"
+#include <cstdint>
+#include <vector>
 
 using namespace llvm;
 using VPCandidateInfo = ValueProfileCollector::CandidateInfo;
@@ -79,9 +85,12 @@ BBInfo *findBBInfo(const BasicBlock *BB, CFGMST &MST) const { return MST.findBBI
 // the index value of each BB in the CFG. The lower 32 bits are split between
 // the upper 16 bits (number of edges) and lower 16 bits reserved for each
 // allocation ID.
-uint64_t computeCFGHash(Function &F) {
+uint64_t computeCFGHash(Function &F, TargetLibraryInfo &TLI) {
     SelectInstVisitor SIVisitor(F);
-    std::vector<std::vector<VPCandidateInfo>> ValueSites;
+    ValueProfileCollector VPC(F, TLI);
+    std::vector<std::vector<VPCandidateInfo>> ValueSites(IPVK_Last + 1);
+    ValueSites[IPVK_MemOPSize] = VPC.get(IPVK_MemOPSize);
+    ValueSites[IPVK_IndirectCallTarget] = VPC.get(IPVK_IndirectCallTarget);
     CFGMST MST(F);
     std::vector<char> Indexes;
     JamCRC JC;
@@ -108,6 +117,7 @@ uint64_t computeCFGHash(Function &F) {
     };
     updateJCH((uint64_t)SIVisitor.getNumofSelectInts());
     updateJCH((uint64_t)ValueSites[IPVK_IndirectCallTarget].size());
-    updateJCH();
-    updateJCH();
+    updateJCH((uint64_t)ValueSites[IPVK_MemOpSize].size());
+    updateJCH((uint64_t)MST.AllEdges.size());
+    return (((uint64_t)JC.getCRC() << 32) + ((uint64_t)JCH.getCRC() << 8)) & 0xFFFFFFFFFFFF0000
 }
