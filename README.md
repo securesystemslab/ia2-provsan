@@ -48,3 +48,17 @@ Example output:
 ```
 Error: Compartment Violation from memory originally allocated at basic.c:48:25
 ```
+
+
+## Acknowledgements
+
+This material is based upon work partially supported by the
+Defense Advanced Research Projects Agency (DARPA) under
+contracts W31P4Q-20-C-0052 and W912CG-21-C-0020. Any
+opinions, findings, and conclusions or recommendations ex-
+pressed in this material are those of the authors and do not
+necessarily reflect the views of the Defense Advanced Re-
+search Projects Agency (DARPA), its Contracting Agents, or
+any other agency of the U.S. Government. We also thank the
+Donald Bren School of Information and Computer Science
+at UCI for an ICS Research Award.
