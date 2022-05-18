@@ -11,6 +11,8 @@ After the sanitizer runs, the collected profiles are fed back into the compiler,
 
 We support default clang/llvm toolchains, with out of tree passes, that are loadable by a standard clang compiler.
 
+IA2-Provsan is distributed under the MIT license, see [LICENSE-MIT](https://github.com/securesystemslab/PKRU-Safe/blob/main/LICENSE-MIT) for details.
+
 ## Collecting Profiles with ProvSan
 Compile your project with additional compile and link flags to correctly build using provsan
 
